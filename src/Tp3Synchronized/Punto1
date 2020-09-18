@@ -1,0 +1,6 @@
+a) Ejecute el código y comente el resultado. ¿Qué corrección debería realizar para
+mejorar la protección de los datos?
+
+Al no estar la seccion critica protejida (metodos delcarados como synchronized en este caso) No existe exclusion mutua por lo que se generan inconcistencias en la ejecucion del codigo
+
+Para mejorar la proteccion de los datos hay que declarar los metodos de la seccion criticas como syncronized para que se genere exclusion mutua entre hilos y no se generen inconsistencias en la ejecucion

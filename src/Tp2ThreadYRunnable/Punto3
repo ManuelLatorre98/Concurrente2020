@@ -1,0 +1,21 @@
+3. Teniendo en cuenta el ejercicio de teoría “Ping-Pong”, representar, EJECUTAR Y
+ANALIZAR las siguientes situaciones:
+a. El código sin la sentencia sleep().
+
+	- Si saco el sleep del main el resultado obtenido es el mismo, lo unico que varia es que la ejecucion del main termina 5 segundos antes que sin el sleep, el programa continua hasta que los hilos
+	  terminen su ejecucion.
+	  Si saco el sleep del run: con el sleep ambos hilos compiten por la prioridad de ejecucion al inicio (en mi caso generalmente gana ping), luego se van ejecutando concurrentemente haciendo el for, se 
+	  imprimen mas pong seguidos porque ping tiene un tiempo de delay mayor (al final se imprimen puchos ping seguidos ya que pong termina antes, entonces si yo saco el sleep dejaran haber un delay 
+	  entre impresiones y la mayoria de las veces intentaran imprimir simultaneamente probocando que compitan por la prioridad para imprimir
+	  
+b. Dentro de la clase main realizar una iteración de una sentencia cualquiera
+con un numero grande de veces.
+c. Ejecutar el código las veces que sea necesario hasta que la salida se vea
+modificada.
+
+	- el main compite por la prioridad para imprimir con pong y ping, generalmente se logra ejecutar todo el for antes de que puedan hacerlo ping o pong, pero no siempre
+	  
+d. Dentro del bloque de iteraciones del inciso b) agregar una sentencia sleep().
+e. De la ejecución de los puntos anteriores ¿Qué puede deducir?
+	  
+	- Si agrego un sleep (1000ms) cada vez que se cumpla ese tiempo el main volvera a competir por la propiedad de impresion con ping o pong.

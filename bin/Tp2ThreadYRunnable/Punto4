@@ -1,0 +1,8 @@
+4. Teniendo en cuenta el ejercicio anterior trate de visualizar el rendimiento de la CPU.
+a. En Linux, ir a “aplicaciones/herramientas del sistema/MATE System Monitor.
+Solapa "Recursos"”.
+b. En Windows, ir a Inicio/Herramientas del sistema/Monitor de Recursos.
+c. ¿Por qué cree que varía? ¿En qué casos hay mayor uso de CPU?
+
+- En mi caso la unica variacion que noto es que en el nucleo1 el uso de cpu se dispara cuando inicio la ejecucion del programa y luego vuelve al consumo que tenia antes de ejecutarse, durante la ejecucion
+  no logro encontrar diferencias a que si no este ejecutandose, quizas un poquito mas de uso en el Nucleo1 nada mas

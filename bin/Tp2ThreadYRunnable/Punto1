@@ -1,0 +1,10 @@
+a. Analice el funcionamiento del siguiente código
+
+	- testeo recurso crea instancias de tipo Cliente (que es subclase de thread osea que hereda comportamiento) llamadas juan e ines, les setea los nombres y las ejecuta con start() luego en run 
+	cada hilo ejecutado imprime "Soy 'nombre del thread'", luego envia el mensaje uso() a Recurso que inicializa una variable tipo Thread llamada t y le asigna el hilo que se esta ejecutando en ese momento 
+	y luego imprime su nombre. terminada la ejecucion de uso vuelve a run y el hilo "duerme" 2000ms y termina la ejecucion del hilo o programa si ya se ejecuraton todos los hilos.
+	con muchas ejecuciones se puede observar que se imprimen los mensajes en distinto orden dependiendo del hilo que haya ganado la prioridad de ejecuion
+	
+b. ¿Cúal es la funcionalidad del método “uso” de Recurso?
+	
+	- El metodo uso crea una instancia de tipo thread a la que se le asigna el hilo que se esta ejecutando actualmente para lugo imprimir el mensaje "en Recurso: Soy 'nombre del hilo'"

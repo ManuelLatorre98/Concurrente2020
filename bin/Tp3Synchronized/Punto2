@@ -1,0 +1,12 @@
+a) Pruebe la ejecución varias veces e indique el valor resultante en cada una.
+b) ¿Qué puede concluir?
+
+	- La mayoria de las veces el mensaje de vida actual de ambos se imprime (simultaneamente) antes de que uno pueda operar, por lo que acceden a la misma vida actual (No simultaneamente por el synchronized), es decir,
+	  los 2 hilos buscan imprimir simultaneamente pisandose por mas que el dato compartido al que acceden para obetener su valor este protegido.
+	  El sout no esta protejido por el synchronized por lo que todo lo correspondiente a impresion depende del SO, una menera de solucionar esto es crear una nueva clase 
+	  como variable compartida que encapsule al sout y protejer el bloque donde se encuentre para que los hilos impriman en orden sin "pisarse"
+	  
+c) Ahora modifique el programa utilizando alguna herramienta para sincronizar la
+ejecución.
+
+	- tengo el mismo resutlado por lo antes explicado
