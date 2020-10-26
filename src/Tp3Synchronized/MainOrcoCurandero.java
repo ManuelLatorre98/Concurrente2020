@@ -12,5 +12,6 @@ public class MainOrcoCurandero {
 		threadOrco.start();
 		threadCurandero.start();
 		
+		
 	}
 }

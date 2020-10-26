@@ -1,6 +1,8 @@
 a) Ejecute el código y comente el resultado. ¿Qué corrección debería realizar para
 mejorar la protección de los datos?
 
-Al no estar la seccion critica protejida (metodos delcarados como synchronized en este caso) No existe exclusion mutua por lo que se generan inconcistencias en la ejecucion del codigo
-
-Para mejorar la proteccion de los datos hay que declarar los metodos de la seccion criticas como syncronized para que se genere exclusion mutua entre hilos y no se generen inconsistencias en la ejecucion
+Al no estar sincronizada la zona critica de hacer un retiro al ejecutarse simultaneamente los hilos puede pasar que si la cuenta tiene 10$ y un hilo esta realizando el retiro el otro hilo tambien se pone a hacer el retiro
+por lo que cuando termina el primer hilo la cuenta queda en 0$ y el otro hilo no detecta esto por lo que retira 10$ dejando la cuenta sobregirada (-10$) para solucionarlo movimos el metodo hacerRetiro al dato compartido 
+CuentaBanco y lo sincronizamos de manera que los hilos solo puedan empezar a realizar un retiro de a uno y no simultaneamente.
+El metodo retiro bancario no esta sincronizado ya que se accede desde hacer retiro que ya esta sincronizado por lo que solo van a acceder de a un hilo si o si, tambien lo pusimos privado para este caso en particular ya que
+no es necesario que lo utilicen otras clases.

@@ -9,9 +9,8 @@ public class Orco implements Runnable{
 	}
 	
 	public void run() {
-		System.out.println("(Accion orco)Vida actual: "+vida.getVida());
 		vida.quitarVida(daño);
-		System.out.println("El Orco causo "+daño+" de daño, vida restante: "+vida.getVida() );
+		
 		
 	}
 }
