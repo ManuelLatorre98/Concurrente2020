@@ -9,6 +9,7 @@ public class Consumidor implements Runnable{
 	}
 	
 	public void run() {
+		while(true) {
 		try {
 			//Thread.sleep((long)((Math.random()*4+1)*1000));
 			Thread.sleep(5000);
@@ -17,6 +18,7 @@ public class Consumidor implements Runnable{
 		//buffer.consumir(); //Con limite
 		this.bufferLimit.consumir(); //Sin limite
 		System.out.println("El consumidor toma un producto");
+	}
 	}
 	
 }
