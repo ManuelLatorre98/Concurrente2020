@@ -10,7 +10,6 @@ public class Barberia {
 		boolean entro=true;
 		if (cantSillas > cantClientesEsp) {
 			System.out.println("El " + Thread.currentThread().getName() + " entra a la barberia");
-			entro=true;
 			cantClientesEsp++;
 			if(cantClientesEsp==1) {
 			this.notify(); //cuando llega un cliente despierto al barbero
