@@ -7,10 +7,13 @@ public class Cliente implements Runnable{
 	}
 	
 	public void run() {
+		boolean entro;
 		try {
 			Thread.sleep(((long)Math.random()*4+5)*1000);
 		}catch(InterruptedException e) {}
-		this.barberia.entrarABarberia();
+		entro=this.barberia.entrarABarberia();
+		if(entro) {
 		this.barberia.cortarsePelo();
+		}
 	}
 }
