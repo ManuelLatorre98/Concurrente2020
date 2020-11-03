@@ -9,6 +9,11 @@ public class Barbero implements Runnable {
 	public void run() {
 		while(true) {
 			this.barberia.trabajar();
+			System.out.println("El barbero atiende un cliente");
+			try {
+			Thread.sleep(5000);
+			}catch(InterruptedException e) {}
+			this.barberia.cortarPelo();
 		}
 	}
 }
