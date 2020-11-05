@@ -1,5 +1,4 @@
 package Tp5SemaforosGenerales;
-
 public class Barberia {
 	private int cantSillas = 5;
 	private int cantClientesEsp = 0;
