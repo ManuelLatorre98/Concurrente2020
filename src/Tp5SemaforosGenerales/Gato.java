@@ -16,7 +16,7 @@ public class Gato implements Runnable{
 				try {
 					Thread.sleep(5000);
 				}catch(InterruptedException e) {}
-				this.comedor.terminarComer();
+				this.comedor.terminarComer(this.especie);
 				System.out.println("El"+Thread.currentThread().getName()+" termino de comer");
 			}else {
 				System.out.println("El"+Thread.currentThread().getName()+" no pudo entrar, se va a pasear");

@@ -7,7 +7,6 @@ public class MainComedorAnimales {
 		Gato []arrayGatos= new Gato[10];
 		Thread[]threadPerros= new Thread[5];
 		Thread[]threadGatos= new Thread[10];
-		
 		for (int i = 0; i < arrayPerros.length; i++) {
 			arrayPerros[i]= new Perro(comedor, 'P');
 		}
