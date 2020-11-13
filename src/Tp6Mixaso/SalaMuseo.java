@@ -13,8 +13,8 @@ public class SalaMuseo {
 
 	public synchronized void entrarSala() {
 
-		while (personasActual == personasPermit && jubiladosEsp > 0) {
-			try {// espera no jubilados
+		while (personasActual >= personasPermit || jubiladosEsp > 0) {
+			try {//esperan no jubilados
 				this.wait();
 			} catch (InterruptedException e) {}
 		}
@@ -23,7 +23,7 @@ public class SalaMuseo {
 
 	public synchronized void entrarSalaJubilado() {
 		try {// Espera jubilados
-			while (personasActual == personasPermit) {
+			while (personasActual >= personasPermit) {
 				jubiladosEsp++;
 				this.wait();
 				jubiladosEsp--;
@@ -39,14 +39,14 @@ public class SalaMuseo {
 	}
 	
 	public synchronized void notificarTemperatura(int temperatura) {
-		if(this.tUmbral<=temperatura && this.personasPermit!= this.maxPersonasUmbral) {
+		if(this.tUmbral<temperatura && this.personasPermit!= this.maxPersonasUmbral) {
 			this.personasPermit=this.maxPersonasUmbral;//No notifico que se cambio ya que no permite que entren mas personas, al contrario
 		}else {
-			if(this.tUmbral>temperatura && this.personasPermit!=this.personasMax) {
-				this.personasActual= this.personasMax;
+			if(this.tUmbral>=temperatura && this.personasPermit!=this.personasMax) {
+				this.personasPermit= this.personasMax;
 				this.notifyAll();//Notifico que pueden entrar mas personas
 			}
 		}
-		
+		System.out.println("Temperatura actualizada a: "+temperatura+"°, cantidad de personas permitidas actualmente: "+this.personasPermit+ ", cantidad de personas actualmente en la sala: "+this.personasActual);
 	}
 }
