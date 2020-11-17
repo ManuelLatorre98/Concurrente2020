@@ -19,10 +19,11 @@ public class Biblioteca {
 
 	public void leer() {
 		this.lock.lock();
+		cantEspLeer++;
 		while (escribiendo) {
 			try {
-				cantEspLeer++;
 				this.esperanLeer.await();
+				
 			} catch (InterruptedException e) {
 			}
 		}
@@ -42,9 +43,9 @@ public class Biblioteca {
 
 	public void escribir() {
 		this.lock.lock();
+		this.cantEspEsc++;
 		while (escribiendo || leyendo > 0) {
 			try {
-				this.cantEspEsc++;
 				this.esperanEscribir.await();
 			} catch (InterruptedException e) {
 			}
@@ -57,7 +58,7 @@ public class Biblioteca {
 	public void dejarEscribir() {
 		this.lock.lock();
 		this.escribiendo = false;
-		if (this.cantEspLeer > 0) {
+		if (this.cantEspLeer > 0) {//En este momento no hay ni escritores ni lectores
 			this.esperanLeer.signalAll();// Si hay lectores esperando los libero a todos para que lean
 		} else {
 			if (this.cantEspEsc > 0) {
