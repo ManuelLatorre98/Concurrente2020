@@ -3,10 +3,10 @@ package LocksCondicion;
 public class mainLectorEscritor {
 	public static void main(String[] args) {
 		Biblioteca biblioteca= new Biblioteca();
-		Lector []lector= new Lector[50];
-		Escritor []escritor= new Escritor[20];
-		Thread[]threadLector= new Thread[50];
-		Thread[]threadEscritor= new Thread[20];
+		Lector []lector= new Lector[15];
+		Escritor []escritor= new Escritor[3];
+		Thread[]threadLector= new Thread[15];
+		Thread[]threadEscritor= new Thread[3];
 		
 		for (int i = 0; i < lector.length; i++) {
 			lector[i]= new Lector(biblioteca);
