@@ -13,6 +13,11 @@ public class CentroHemoterapia {
 	private int nroRevistas=9;
 	private int nroRevistasOcup=0;
 	
+	public CentroHemoterapia() {
+		lock=new ReentrantLock(true);
+		this.esperaLeyendo= this.lock.newCondition();
+		this.esperaViendoTele= this.lock.newCondition();
+	}
 	public int sacarNumero() {
 		int nro;
 		lock.lock();
@@ -47,7 +52,7 @@ public class CentroHemoterapia {
 		lock.lock();
 		while((nroTurPersona!= nroTurno && nroRevistasOcup==nroRevistas) || this.nroCamillasOcup==this.nroCamillas) {//Si no es su turno y no hay revistas espera poder agarrar una
 			try {
-				System.out.println("La "+Thread.currentThread()+" no puede tomar revista, mira la tele");
+				System.out.println("La "+Thread.currentThread().getName()+" no puede tomar revista, mira la tele");
 				esperaViendoTele.await();//espera viendo tele si no hay revistas
 			}catch(InterruptedException e) {}
 		}
@@ -59,7 +64,8 @@ public class CentroHemoterapia {
 		lock.lock();
 		while(nroTurPersona!= nroTurno || this.nroCamillasOcup==this.nroCamillas) {//Mientras no sea su turno y no haya camillas espera
 			try {
-				System.out.println("La "+Thread.currentThread()+" toma una revista y espera leyendo a ser atentida");
+				this.nroRevistasOcup++;
+				System.out.println("La "+Thread.currentThread().getName()+" toma una revista y espera leyendo a ser atentida");
 				leia=true;
 				this.esperaLeyendo.await();//Espera a que sea su turno
 			}catch(InterruptedException e) {}
@@ -83,13 +89,15 @@ public class CentroHemoterapia {
 		lock.lock();
 			this.nroCamillasOcup++;
 			this.nroTurno++;//indico quien es el siguiente que podria entrar, si hay camillas pasaria,si no , no.
+			this.esperaViendoTele.signalAll();//Avisa a todos los que miran tele y a todos los que leen
+			this.esperaLeyendo.signalAll();//Si coincide su numero de turno y como hay camillas pasan
 		lock.unlock();
 	}
 	
 	public void salir() {
 		lock.lock();
 		this.nroCamillasOcup--;//hay una camilla mas disponible
-		this.esperaViendoTele.signalAll();//Avisa a todos los que mira tele y a todos los que leen
+		this.esperaViendoTele.signalAll();//Avisa a todos los que miran tele y a todos los que leen
 		this.esperaLeyendo.signalAll();//Si coincide su numero de turno y como hay camillas pasan
 		lock.unlock();
 	}

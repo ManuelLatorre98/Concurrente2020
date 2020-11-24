@@ -11,11 +11,7 @@ public class Persona implements Runnable {
 	
 	public void run() {
 		this.nroTurno=this.centro.sacarNumero();//Saca numero y lo guarda
-		System.out.println("La "+Thread.currentThread().getName()+" saca numero");
-		
-		if(this.centro.intentarAtenderse(nroTurno)) {
-			this.atencion();
-		}else {//Si no es atendido de una
+		System.out.println("La "+Thread.currentThread().getName()+" saca numero"+this.nroTurno);
 			this.sentado= this.centro.intentarSentarse();//Indica si se sento o no
 			if(this.sentado) {
 				System.out.println("La "+Thread.currentThread().getName()+" se sienta");
@@ -26,15 +22,15 @@ public class Persona implements Runnable {
 			this.centro.tomarRevista(nroTurno);
 			this.centro.esperarLeyendo(nroTurno);
 			this.centro.pararse(sentado);
-			
-		}
+			this.atencion();
+		
 	}
 	
 	public void atencion() {
 		this.centro.atenderse();
-		System.out.println("La "+Thread.currentThread().getName()+" se esta extrayendo sangre");
+		System.out.println("La "+Thread.currentThread().getName()+" se esta extrayendo sangre"+this.nroTurno);
 		try {
-			Thread.sleep((long)Math.random()*10+5);
+			Thread.sleep((long)(Math.random()*10+5)*1000);
 		}catch(InterruptedException e) {}
 		this.centro.salir();
 		System.out.println("La persona termino de extraerse sangre se va del centro");

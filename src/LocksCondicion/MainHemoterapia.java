@@ -2,8 +2,8 @@ package LocksCondicion;
 
 public class MainHemoterapia {
 	public static void main(String[] args) {
-		Persona [] personas= new Persona[50];
-		Thread[] threadPersonas= new Thread[50];
+		Persona [] personas= new Persona[10];
+		Thread[] threadPersonas= new Thread[10];
 		CentroHemoterapia centro= new CentroHemoterapia();
 		
 		for (int i = 0; i < personas.length; i++) {
