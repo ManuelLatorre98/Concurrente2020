@@ -15,6 +15,9 @@ public class Puente {
 	private int turnoActualNorte=1;
 	private int turnoActualSur=1;
 	
+	private int turnoSalidaNorte=1;
+	private int turnoSalidaSur=1;
+	
 	public synchronized int obtieneTurnoNorte() {
 		int entrega= turnoEntregaNorte;
 		this.turnoEntregaNorte++;
@@ -32,7 +35,7 @@ public class Puente {
 		this.contCochesEspNorte++;
 		while (pasaSur || this.cochesEnPuente==10 || contNorteCambio==0 || turno!=this.turnoActualNorte) {
 			try {
-				this.wait();// Mientras haya pasando autos del sur espera
+				this.wait();// Mientras haya pasando autos del sur, 10 autos en puente, tenga que cambiar o no sea su turno
 			} catch (InterruptedException e) {
 			}
 		}
@@ -41,23 +44,38 @@ public class Puente {
 		}
 		this.contCochesEspNorte--;
 		this.cochesEnPuente++;
-		this.turnoActualNorte++;//Indica que paso que podria pasar el siguiente
+		this.turnoActualNorte++;//Indica que paso y que podria pasar el siguiente
+		this.contNorteCambio--;
+		
+		this.notifyAll();
 	}
 
-	public synchronized void salirCocheNorte() {
+	public synchronized void salirCocheNorte(int turno) {
+		while(turnoSalidaNorte!=turno) {
+			try {
+				this.wait();
+			}catch(InterruptedException e) {}
+		}
+		this.turnoSalidaNorte++;
+		
 		this.cochesEnPuente--;
-		this.contNorteCambio--;
 		if (this.contCochesEspSur > 0 && (this.contNorteCambio == 0 || this.contCochesEspNorte == 0) && this.cochesEnPuente==0) {// Si pasaron 10 o no hay  esperando avisa a los
 			// del sur
 			this.pasaNorte = false;
+			this.pasaSur=true;
 			this.contSurCambio = 10;
-			this.notifyAll();
+			this.contNorteCambio=0;
 		} else {
 			if (this.contNorteCambio == 0 && this.contCochesEspSur == 0 && this.contCochesEspNorte > 0 && this.cochesEnPuente==0) {// Si no hay coches esperando del norte pero si del sur  deja  pasar del norte
 				this.contNorteCambio = 10;
-				this.notifyAll();
 			}
 		}
+		
+		
+		this.notifyAll();
+		//verifico turno salida
+		//cuando salgo incremento turno salida
+		//notifico turno de la salida
 
 	}
 
@@ -77,21 +95,34 @@ public class Puente {
 		this.contCochesEspSur--;
 		this.cochesEnPuente++;
 		this.turnoActualSur++;
+		this.contSurCambio--;
+		this.notifyAll();
 	}
 
-	public synchronized void salirCocheSur() {
+	public synchronized void salirCocheSur(int turno) {	
+		while(turnoSalidaSur!=turno) {
+			try {
+				this.wait();
+			}catch(InterruptedException e) {}
+		}
+		this.turnoSalidaSur++;
 		this.cochesEnPuente--;
-		this.contSurCambio--;
+		
 		if (this.contCochesEspNorte > 0 && (this.contSurCambio == 0 || this.contCochesEspSur == 0) && this.cochesEnPuente==0) {// Si pasaron 10 o no hay esperando avisa a los
 			// del norte
 			this.pasaSur = false;
+			this.pasaNorte=true;
 			this.contNorteCambio= 10;
-			this.notifyAll();
+			this.contSurCambio=0;
 		} else {
 			if (this.contSurCambio == 0 && this.contCochesEspNorte == 0 && this.contCochesEspSur > 0 && this.cochesEnPuente==0) {// Si no hay coches esperando del norte pero si del sur deja pasar del norte
 				this.contSurCambio = 10;
-				this.notifyAll();
+				
 			}
 		}
+		this.notifyAll();
 	}
+	
+	
+	
 }

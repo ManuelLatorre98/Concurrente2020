@@ -13,19 +13,20 @@ public class Coche implements Runnable{
 		
 		if(this.direccion=='N') {
 			turno=this.puente.obtieneTurnoNorte();
-			//System.out.println("El "+Thread.currentThread().getName()+" saco el turno: "+this.turno);
+			//System.out.println("El "+Thread.currentThread().getName()+" saco el turno NORTE: "+this.turno);
 			this.puente.entraCocheNorte(this.turno);
 			System.out.println("El "+Thread.currentThread().getName()+" entro al puente por el norte. Turno: "+this.turno);
 			this.cruzarPuente();
-			this.puente.salirCocheNorte();
-			System.out.println("El "+Thread.currentThread().getName()+" salio del puente");
+			this.puente.salirCocheNorte(this.turno);
+			System.out.println("El "+Thread.currentThread().getName()+" salio del puente NORTE"+this.turno);
 		}else {
 			turno=this.puente.obtieneTurnoSur();
+			//System.out.println("El "+Thread.currentThread().getName()+" saco el turno SUR: "+this.turno);
 			this.puente.entraCocheSur(this.turno);
-			//System.out.println("El "+Thread.currentThread().getName()+" entro al puente por el sur. Turno: "+this.turno);
+			System.out.println("El "+Thread.currentThread().getName()+" entro al puente por el sur. Turno: "+this.turno);
 			this.cruzarPuente();
-			this.puente.salirCocheSur();
-			System.out.println("El "+Thread.currentThread().getName()+" salio del puente");
+			this.puente.salirCocheSur(this.turno);
+			System.out.println("El "+Thread.currentThread().getName()+" salio del puente SUR"+this.turno);
 		}
 	}
 	
