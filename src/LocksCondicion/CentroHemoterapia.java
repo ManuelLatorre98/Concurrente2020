@@ -27,7 +27,7 @@ public class CentroHemoterapia {
 		return nro;
 	}
 	
-	public boolean intentarAtenderse(int nroTurPersona) {
+	public boolean intentarAtenderse(int nroTurPersona) {//NO LO USO
 		boolean atendido=false;
 		lock.lock();
 		if(nroTurPersona== nroTurno && nroCamillasOcup<nroCamillas) {//Si coincide el nro de turno y hay camillas
