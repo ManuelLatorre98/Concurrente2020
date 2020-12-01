@@ -1,4 +1,4 @@
-package LatorreFAI1931;
+package LatorreFAI1931Parcial1;
 
 public class ClinicoControl implements Runnable{
 	private Centro centro;

@@ -1,7 +1,7 @@
 package Parcial;
 
 import java.util.concurrent.Semaphore;
-import 
+
 public class Casa {
 	private Semaphore semSillas = new Semaphore(4, true);
 	private Semaphore semPasear = new Semaphore(0, true);

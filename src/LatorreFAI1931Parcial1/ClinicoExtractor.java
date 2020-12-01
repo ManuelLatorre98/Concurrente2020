@@ -1,4 +1,4 @@
-package LatorreFAI1931;
+package LatorreFAI1931Parcial1;
 
 public class ClinicoExtractor implements Runnable{
 private Centro centro;
