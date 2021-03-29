@@ -34,7 +34,6 @@ public class MontañaRusa {
 		if(abierto) {
 			subio=true;//retorno si el pasajero paso porque subio o porque cerro la montaña
 			this.contPasajCarro++;//Indico que hay un pasajero mas en el carro
-
 		}
 		pasajerosEsp--;//Hay un pasajero menos esperando
 		mutex.release();
