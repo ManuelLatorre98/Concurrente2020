@@ -20,6 +20,8 @@ public class Pasajero implements Runnable{
 	private static final String CYAN = "\u001B[36m";
 	private static final String WHITE = "\u001B[37m";
 	private static final String RESET = "\033[0m";  // Text Reset
+	private static final String ROJOFONDO = "\u001b[41;1m";  
+	private static final String AZULFONDO = "\u001b[44m"; 
 	
 	public Pasajero(Aeropuerto aero,Reloj reloj) {
 		this.aeropuerto=aero;
@@ -28,61 +30,67 @@ public class Pasajero implements Runnable{
 	
 	public void run() {
 		//Entrada aeropuerto
-		PuestoAtencion centroAten;
-		this.setNombre(Thread.currentThread().getName());//BORRAR
-		System.out.println("El "+Thread.currentThread().getName()+" intenta entrar al aeropuerto");
-		this.aeropuerto.intentoEntradaAeropuerto();
-		System.out.println("El "+Thread.currentThread().getName()+" entra al aeropuerto");
-	 	this.aeropuerto.entrarAeropuerto(this);
-		System.out.println("El "+Thread.currentThread().getName()+" entro al aeropuerto y se le asigno la "+this.reserva.toString());
+		//while(true) {//Dificulta testeo
+			PuestoAtencion centroAten;
+			this.setNombre(Thread.currentThread().getName());//BORRAR
+			System.out.println("El "+Thread.currentThread().getName()+" intenta entrar al aeropuerto");
+			this.aeropuerto.intentoEntradaAeropuerto();
+			System.out.println("El "+Thread.currentThread().getName()+" entra al aeropuerto");
+			this.aeropuerto.entrarAeropuerto(this);
+			System.out.println("El "+Thread.currentThread().getName()+" entro al aeropuerto y se le asigno la "+this.reserva.toString());
 		
 		//Centro informes
-		System.out.println("El "+Thread.currentThread().getName()+" hace cola para entrar al centro de informes");
-		this.aeropuerto.esperaAtencionCentroInf(this);
-		System.out.println(CYAN+"AL "+Thread.currentThread().getName()+" lo llaman y pasa al centro de informes"+RESET);
-		this.aeropuerto.pasarCentroInf();
-		System.out.println(CYAN+"El "+Thread.currentThread().getName()+" termina de ser atendido y es derivado al centro de atencion nro "+this.puestoAtenAsignado.getNro()+" para realizar el checkin y espera a ser atendido"+RESET);
+			System.out.println("El "+Thread.currentThread().getName()+" hace cola para entrar al centro de informes");
+			this.aeropuerto.esperaAtencionCentroInf(this);
+			System.out.println(CYAN+"AL "+Thread.currentThread().getName()+" lo llaman y pasa al centro de informes"+RESET);
+			this.aeropuerto.pasarCentroInf();
+			System.out.println(CYAN+"El "+Thread.currentThread().getName()+" termina de ser atendido y es derivado al centro de atencion nro "+this.puestoAtenAsignado.getNro()+" para realizar el checkin y espera a ser atendido"+RESET);
 		
 		//Puesto atencion
-		this.puestoAtenAsignado.esperarEnHall(this);
-		System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es llamado por el guardia y hace cola en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
-		this.puestoAtenAsignado.esperaAtencionEnCola();
-		System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es atendido en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
-		this.puestoAtenAsignado.esperaFinAtencion();
-		System.out.println(GREEN+"El "+Thread.currentThread().getName()+" termino de ser atendido en el centro de atencion nro: "+this.puestoAtenAsignado.getNro()+" y se le indico que vaya a la terminal: "+this.terminalAsignada.getLetraTerminal()+". Va a tomar el tren"+RESET);
+			this.puestoAtenAsignado.esperarEnHall(this);
+			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es llamado por el guardia y hace cola en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
+			this.puestoAtenAsignado.esperaAtencionEnCola();
+			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es atendido en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
+			this.puestoAtenAsignado.esperaFinAtencion();
+			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" termino de ser atendido en el centro de atencion nro: "+this.puestoAtenAsignado.getNro()+" y se le indico que vaya a la terminal: "+this.terminalAsignada.getLetraTerminal()+". Va a tomar el tren"+RESET);
 	
 		//Tren
-		this.aeropuerto.esperarTren();
-		this.aeropuerto.indicarTerminalParada(terminalAsignada);
-		this.aeropuerto.tomarTren();
-		System.out.println(YELLOW+"El "+Thread.currentThread().getName()+" y viaja a su terminal asignada"+RESET);
-		this.aeropuerto.viajarEnTren(terminalAsignada);
-		try {
-			Thread.sleep(10);
-		}catch(InterruptedException e) {}//Para que el mensaje salga en orden justo despues del mensaje de que frena el tren
-		System.out.println(YELLOW+"El "+Thread.currentThread().getName()+" baja del tren y entra a la terminal: "+this.terminalAsignada.getLetraTerminal()+RESET);
+			this.aeropuerto.esperarTren();
+			this.aeropuerto.indicarTerminalParada(terminalAsignada);
+			this.aeropuerto.tomarTren();
+			System.out.println(YELLOW+"El "+Thread.currentThread().getName()+" y viaja a su terminal asignada"+RESET);
+			this.aeropuerto.viajarEnTren(terminalAsignada);
+			try {
+				Thread.sleep(10);
+			}catch(InterruptedException e) {}//Para que el mensaje salga en orden justo despues del mensaje de que frena el tren
+			System.out.println(YELLOW+"El "+Thread.currentThread().getName()+" baja del tren y entra a la terminal: "+this.terminalAsignada.getLetraTerminal()+RESET);
 	
 		//Terminal
-		this.entrarShop();//El pasajero decide si va a entrar al shop de la terminal o no
-		if(this.entraShop) {//Si el pasajero quiere entrar al shop
-			if(this.tiempoFreeShop()) {//Si tiene tiempo para ir al shop va
-				if(this.terminalAsignada.intentarEntrarShop(this)) {//Intenta entrar al shop, si lo logra
-					if(this.compraShop) {//Si tiene pensado comprar algo en el shop
-						System.out.println("El pasajero "+Thread.currentThread().getName()+" entra en el shop y compra");
-						this.terminalAsignada.comprarEnShop(this);
-					}else {
-						System.out.println("El pasajero "+Thread.currentThread().getName()+" entra en el shop y mira");
-						this.mirarEnShop();
+			this.entrarShop();//El pasajero decide si va a entrar al shop de la terminal o no
+			if(this.entraShop) {//Si el pasajero quiere entrar al shop
+				if(this.tiempoFreeShop()) {//Si tiene tiempo para ir al shop va
+					if(this.terminalAsignada.intentarEntrarShop(this)) {//Intenta entrar al shop, si lo logra
+						if(this.compraShop) {//Si tiene pensado comprar algo en el shop
+							System.out.println("El pasajero "+Thread.currentThread().getName()+" entra en el shop y compra");
+							this.terminalAsignada.comprarEnShop(this);
+						}else {
+							System.out.println("El pasajero "+Thread.currentThread().getName()+" entra en el shop y mira");
+							this.mirarEnShop();
+						}
+						System.out.println("El pasajero "+Thread.currentThread().getName()+" sale del shop");
+						this.terminalAsignada.salirShop();
 					}
-					System.out.println("El pasajero "+Thread.currentThread().getName()+" sale del shop");
-					this.terminalAsignada.salirShop();
 				}
 			}
+			if(this.reloj.getHoraInt()<=this.reloj.horaStringToHoraInt(this.reserva.getHoraArribo())) {
+				System.out.println("El pasajero "+Thread.currentThread().getName()+" espera sentado el embarque a las "+this.reserva.getHoraArribo()+"hs");
+				this.terminalAsignada.esperarEmbarque(this.reserva);
+				System.out.println(AZULFONDO+"El pasajero "+Thread.currentThread().getName()+" es llamado para embarque en puesto de embarque nro "+this.reserva.getNroPuerto()+" y toma su vuelo a las "+this.reserva.getHoraArribo()+RESET);
+			}else {
+				System.out.println(ROJOFONDO+"El pasajero "+Thread.currentThread().getName()+" perdio su vuelo de las "+reserva.getHoraArribo()+"hs. Se va del aeropuerto"+RESET);
+			}
 		}
-		System.out.println("El pasajero "+Thread.currentThread().getName()+" espera sentado el embarque");
-		this.terminalAsignada.esperarEmbarque(this.reserva);
-		System.out.println(RED+"El pasajero "+Thread.currentThread().getName()+" es llamado para embarque y toma su vuelo"+RESET);
-	}
+	//}
 	
 	private void entrarShop() {
 		int valor;
@@ -132,11 +140,6 @@ public class Pasajero implements Runnable{
 	public void setTerminalAsignada(Terminal terminal) {
 		this.terminalAsignada=terminal;
 	}
-	
-/*	public void setPuestoEmbarqueAsignado(PuestoEmbarque puesto) {
-		this.puestoEmbarqueAsignado=puesto;
-	}*/
-
 	
 	public String getNombre() {//TESTEO BORRAR
 		return this.nombre;

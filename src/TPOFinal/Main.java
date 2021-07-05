@@ -35,7 +35,7 @@ public class Main {
 	
 		
 		//Hora
-		GestorHora gestorHora= new GestorHora(reloj,aeropuerto,terminales);
+		GestorHora gestorHora= new GestorHora(reloj,aeropuerto,terminales,puestosEmbarque);
 		Thread threadGestorHora=new Thread(gestorHora,"GestorHora");
 		
 		//Pasajeros

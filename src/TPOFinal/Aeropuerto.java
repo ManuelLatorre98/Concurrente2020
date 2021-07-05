@@ -12,6 +12,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Aeropuerto {
+	private static final String ROJOFONDO = "\u001b[41;1m";
+	private static final String RESET = "\033[0m";  // Text Reset
 	private Terminal[]terminales;//Recibe por parametro, Las terminales estan asociadas con el nro de reserva
 	private Reloj reloj;//Dato compartido
 	private String horaApertura;
@@ -30,7 +32,8 @@ public class Aeropuerto {
 	private BlockingQueue <Pasajero> colaCentroInf = new LinkedBlockingQueue<Pasajero>();//Cola ilimitada
 	
 	//Tren
-	int capacidadTren=10;//La responsabilidad de setear esto creo que deberia ser del thread tren o directamente el tren deberia dar dicha info, lo seteo asi para no enrredar tanto
+	private int capacidadTren=10;//La responsabilidad de setear esto creo que deberia ser del thread tren o directamente el tren deberia dar dicha info, lo seteo asi para no enrredar tanto
+	private int tiempoEsperaMs=15000;
 	private Lock lock;
 	private Condition esperaPasajeros;
 	private Condition esperaTren;
@@ -118,24 +121,18 @@ public class Aeropuerto {
 		int puestoTerminal=0;//Define el puesto de embarque, 1 puesto de embarque por vuelo, 7 vuelos por aerolinea/plataforma,
 		Reserva reserva;
 		String horaArribo;
-		int multiplicadorHoras;
-		int horaMin;
-		puestoTerminal=((int)(Math.random()*this.terminales[nroReserva-1].getCantidadPuestosEmbarque())+1)+(this.terminales[nroReserva-1].getCantidadPuestosEmbarque()*(nroReserva-1));;//Obtengo el embarque de 1 a puestosEmbarque y lo asigno a su plataforma con la suma
-		System.out.println("HORA RELOOOOOOOOOOOOOJ"+reloj.getHoraInt()+ "Hora : "+reloj.getHoraStr());
-		multiplicadorHoras=((int)(Math.random()*5)+11);//Entre 11 y 15//Entre 8 y 15 horas desde que entran a la terminal
-		horaMin=reloj.getHoraInt()+(60*multiplicadorHoras);//Siempre va a ser hora exacta porque se ejecuta a las 6:00 cuando abre el aeropuerto
-		horaArribo=reloj.horaIntToHoraString(horaMin);
-
-		reserva=new Reserva(nroReserva,this.terminales[nroReserva-1].getPuestoEmbarque(puestoTerminal).getNroPuesto(),horaArribo);
-
+		PuestoEmbarque puestoEmbarquePasajero;
+		puestoTerminal=((int)(Math.random()*this.terminales[nroReserva-1].getCantidadPuestosEmbarque())+1)+(this.terminales[nroReserva-1].getCantidadPuestosEmbarque()*(nroReserva-1));
+		puestoEmbarquePasajero=this.terminales[nroReserva-1].getPuestoEmbarque(puestoTerminal);//Obtengo el puesto asignado
+		horaArribo=puestoEmbarquePasajero.getHorarioRandom();//Me entrega uno de sus horarios de embarque
+		reserva=new Reserva(nroReserva,puestoEmbarquePasajero.getNroPuesto(),horaArribo);
 		pasajero.setReserva(reserva);
-		
 	}
 	
 	public void esperaAtencionCentroInf(Pasajero pasajero) {
 		try {
 			this.mutexCentroInf.acquire();//El lock de la blocking queue va tan rapido que los hilos llegan al semaforo en orden distinto al que entran en cola
-			Thread.sleep(1);//Con esto hago que entren con una diferencia de 1ms a la cola y por lo tanto al semaforo lleguen en el orden que entraron a la cola
+			Thread.sleep(1);//Con esto hago que entren con una diferencia de 1ms a la cola y por lo tanto al semaforo lleguan en el orden que entraron a la cola
 			this.mutexCentroInf.release();
 			this.colaCentroInf.put(pasajero);//Pongo una referencia a si mismo en la cola
 			
@@ -180,7 +177,7 @@ public class Aeropuerto {
 	public void tomarTren() {
 		
 		try {	
-			this.barrierStartTren.await(15000,TimeUnit.MILLISECONDS);//Espera a que el tren este lleno o pase el tiempo
+			this.barrierStartTren.await(this.tiempoEsperaMs,TimeUnit.MILLISECONDS);//Espera a que el tren este lleno o pase el tiempo
 		}catch(InterruptedException e) {
 		}catch(BrokenBarrierException e) {
 		}catch(TimeoutException e) {//Suponogo que viene para aca con el timeout
@@ -255,7 +252,7 @@ public class Aeropuerto {
 		for (int i = 0; i < this.terminales.length; i++) {//Recorre terminal por terminal
 			lock.lock();
 			tren.viajar(this.terminales[i].getLetraTerminal());//Viaja
-			hayPasajeros=this.cantPasajerosTerminal[i]>0;//Lo hago asi para que los mensajes salgan en orden
+			hayPasajeros=this.cantPasajerosTerminal[i]>0;//tomo y retomo el lock luego para que los mensajes salgan en orden
 			lock.unlock();
 			
 			if(hayPasajeros) {//Si hay pasajeros que quieren bajar en esa terminal el tren frena y les avisa
@@ -263,7 +260,8 @@ public class Aeropuerto {
 				this.letraTerminalActual=this.terminales[i].getLetraTerminal();//Indico en que terminal esta parado el tren
 				this.viajando.signalAll();//Avisa a todos los pasajeros que bajo en una terminal, ellos decidiran si les corresponde o no
 				lock.unlock();
-				//Antes era todo un solo lock y salia a destiempo el mensaje de para del tren con la bajada de los pasajeros
+				
+				//Antes era todo un solo lock y salia a destiempo el mensaje de parada del tren con la bajada de los pasajeros
 				lock.lock();
 				tren.frenarTerminal(this.terminales[i].getLetraTerminal(), this.cantPasajerosTerminal[i]);//se liberaban antes 1,5seg despues de este mensaje porque el lock sigue siendo del tren 
 				this.cantPasajerosTerminal[i]=0;//inidico que no quedan pasajeros para bajar en esa terminal para la vuelta
@@ -288,8 +286,14 @@ public class Aeropuerto {
 	public synchronized void revicionHora() {//Luego de actualizarse la hora se notifica por si estaba cerrado y pasa a estar abierto
 		if(!abierto && this.reloj.getHoraInt()>=this.horaAperturaInt && this.reloj.getHoraInt()<=this.horaCierreInt) {//Si estaba cerrado y es hora de abrir notifica
 			this.abierto=true;
+			System.out.println(ROJOFONDO+"ABRE EL AEROPUERTO"+RESET);
 			this.notifyAll();
-		}
+		}else
+			if(abierto && this.reloj.getHoraInt()==this.horaCierreInt) {
+				this.abierto=false;
+				System.out.println(ROJOFONDO+"CIERRA EL AEROPUERTO"+RESET);
+				
+			}
 	}
 	
 	
