@@ -8,56 +8,63 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class HallCentral {
     private Lock accesoPuesto;
-    private Condition[] arrayCondPuestos;
+    private Condition[] arrayCondPasajeros;
+
+    private Condition condGuardias;
     private int [] lugaresLibres;
-    private int pasajerosEnEspera=0;
+    private int []pasajerosEnEspera;
     private int capMaxPuestoAten;
     public HallCentral(int cantPuestosAten, int capPuestosAten){
         capMaxPuestoAten = capPuestosAten;
         accesoPuesto = new ReentrantLock(true);
-        arrayCondPuestos= new Condition[cantPuestosAten];
+        arrayCondPasajeros= new Condition[cantPuestosAten];
+        condGuardias= accesoPuesto.newCondition();
         lugaresLibres = new int [cantPuestosAten];
-        for (int i = 0; i < arrayCondPuestos.length; i++) {
-            arrayCondPuestos[i] = accesoPuesto.newCondition();
+        pasajerosEnEspera = new int[cantPuestosAten];
+        for (int i = 0; i < cantPuestosAten; i++) {
+            arrayCondPasajeros[i] = accesoPuesto.newCondition();
+            lugaresLibres[i]=capPuestosAten;
+            pasajerosEnEspera[i]=0;
         };
 
-        for (int i = 0; i < lugaresLibres.length; i++) {
-            lugaresLibres[i]=capPuestosAten;
-        }
     }
 
     public void entrarHallCentral(int nroPuesto){
-
         try{
             accesoPuesto.lock();
-            pasajerosEnEspera++;
-            this.notifyAll();//Le dice a los guardias que entro al hall
+            pasajerosEnEspera[nroPuesto-1]++;
+            condGuardias.signalAll();//Le dice a los guardias que entro al hall
             while(lugaresLibres[nroPuesto-1] == 0){
-                arrayCondPuestos[nroPuesto-1].await(); //Si no hay lugar en su puesto espera
+                arrayCondPasajeros[nroPuesto-1].await(); //Si no hay lugar en su puesto espera
             }
-
-            lugaresLibres[nroPuesto-1]--; //Resta un lugar
-            pasajerosEnEspera--;
+            lugaresLibres[nroPuesto-1]--; //Resta un lugar en el puesto
+            pasajerosEnEspera[nroPuesto-1]--;//Hay un pasajero menos esperando
             accesoPuesto.unlock();
          }catch(InterruptedException e){}
     }
 
-    public synchronized void llamarPasajero(int nroPuestoAsignado){
-        try{
-            while(lugaresLibres[nroPuestoAsignado-1] == capMaxPuestoAten || pasajerosEnEspera==0){
-                System.out.println("No hay lugar en el puesto "+nroPuestoAsignado+" el guardia espera");
-                this.wait();
-            }
-            System.out.println("El guardia llama a un pasajero para que pase al puesto de atencion "+nroPuestoAsignado);
-            arrayCondPuestos[nroPuestoAsignado-1].signal(); //Desbloquea a un pasajero del hall
+    public void llamarPasajero(int nroPuestoAsignado){
+        accesoPuesto.lock();
+         try {
+             while (lugaresLibres[nroPuestoAsignado - 1] == 0 || pasajerosEnEspera[nroPuestoAsignado-1] == 0) {
+                 if (pasajerosEnEspera[nroPuestoAsignado-1] == 0) {
+                     //System.out.println("No hay pasajeros en el hall el guardia del puesto " + nroPuestoAsignado + " duerme");
+                 } else{
+                     //System.out.println("No hay lugar en el puesto " + nroPuestoAsignado + " el guardia duerme");
+                 }
+                 condGuardias.await();
+             }
 
-        }catch(InterruptedException e){}
+             //System.out.println("El guardia llama a un pasajero para que pase al puesto de atencion " + nroPuestoAsignado);
+             arrayCondPasajeros[nroPuestoAsignado-1].signal(); //Desbloquea a un pasajero del hall
+             accesoPuesto.unlock();
+         } catch (InterruptedException e) {}
     }
 
     public void salirDelHall(int nroPuesto){
         accesoPuesto.lock();
         lugaresLibres[nroPuesto-1]++;
-        this.notifyAll();
+        condGuardias.signalAll();
         accesoPuesto.unlock();
     }
 }

@@ -5,6 +5,7 @@ public class Main {
 	public static void main(String[] args) {
 		int cantTerminales=3;
 		int cantPuestosEmbarque=7;//Todas las terminales tienen la misma cantidad para simplificar creacion
+		int cantPasajeros=48;
 		Reloj reloj=new Reloj("05:00");
 		PuestoEmbarque []puestosEmbarque=new PuestoEmbarque[cantPuestosEmbarque*cantTerminales];
 		Terminal[]terminales=new Terminal[cantTerminales];
@@ -35,7 +36,7 @@ public class Main {
 		Thread threadGestorHora=new Thread(gestorHora,"GestorHora");
 		
 		//Pasajeros
-		Pasajero[]arrayPasajeros=new Pasajero[48];
+		Pasajero[]arrayPasajeros=new Pasajero[cantPasajeros];
 		Thread [] threadPasajeros= new Thread[arrayPasajeros.length];
 		
 		//CentroInformes
@@ -72,7 +73,7 @@ public class Main {
 		
 		//instanciacion de guardias
 		for (int i = 0; i < arrayGuardias.length; i++) {
-			arrayGuardias[i]=new Guardia(aeropuerto.getListaPuestosAtencion()[i]);
+			arrayGuardias[i]=new Guardia(aeropuerto.getHallCentral(),i+1);
 		}
 		for (int i = 0; i < threadGuardias.length; i++) {
 			threadGuardias[i]=new Thread(arrayGuardias[i],"Guardia"+(i+1));

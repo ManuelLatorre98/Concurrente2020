@@ -34,7 +34,7 @@ public class Aeropuerto {
 	private BlockingQueue <Pasajero> colaCentroInf = new LinkedBlockingQueue<Pasajero>();//Cola ilimitada
 
 	//Hall Puestos de atencion
-	private HallCentral hallCentral = new HallCentral(puestosAten.length,capPuestosAten);
+	private HallCentral hallCentral;
 	//Tren
 	private int capacidadTren=10;//La responsabilidad de setear esto creo que deberia ser del thread tren o directamente el tren deberia dar dicha info, lo seteo asi para no enrredar tanto
 	private int tiempoEsperaMs=15000;
@@ -58,9 +58,9 @@ public class Aeropuerto {
 		this.reloj=reloj;
 		this.horaAperturaInt=reloj.traducirHora(horaApertura);
 		this.horaCierreInt=reloj.traducirHora(horaCierre);
-		
 		this.puestosAten=new PuestoAtencion[this.terminales.length];//Voy a tener 1 puesto de atencion por terminal/aerolinea
 		this.crearCentrosAtencion();
+		hallCentral=new HallCentral(puestosAten.length,capPuestosAten);
 		
 		this.lock=new ReentrantLock(true);
 		this.esperaPasajeros=this.lock.newCondition();
@@ -216,15 +216,11 @@ public class Aeropuerto {
 			try {
 				Thread.sleep(10);//Para que salgan mensajes en orden y quede claro en testeo
 				pasajero=(Pasajero)this.colaCentroInf.take();//Saca la referencia del cliente de la cola, si esta vacia queda bloqueado
+				this.semCentroInf.release();//Avisa a un pasajero que puede pasar
+
+				centro.atenderCliente(pasajero);//Atiende al pasajero y se lleva la referencia de los centros de atencion para poder trabajar
+				this.semAtencionCentroInf.release();
 			}catch(InterruptedException e) {}
-
-			//System.out.println("PASAJEROOOOOOOOOOOOOO"+pasajero.getNombre());//Prueba que atiende al que saca de la lista junto con mensaje en centroInforems.atenderCliente(). con un sleep de 500 antes del take se ven mensajes en orden
-			this.semCentroInf.release();//Avisa a un pasajero que puede pasar
-
-			//El setPuestoAten tiene mas sentido que se haga en centroInformes o aca?
-
-			centro.atenderCliente(pasajero);//Atiende al pasajero y se lleva la referencia de los centros de atencion para poder trabajar
-			this.semAtencionCentroInf.release();
 		}
 	
 	//Operaciones del tren

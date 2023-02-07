@@ -43,15 +43,16 @@ public class Pasajero implements Runnable{
 			System.out.println(CYAN+"AL "+Thread.currentThread().getName()+" lo llaman y pasa al centro de informes"+RESET);
 			this.aeropuerto.pasarCentroInf();
 			System.out.println(CYAN+"El "+Thread.currentThread().getName()+" termina de ser atendido y es derivado al centro de atencion nro "+this.puestoAtenAsignado.getNro()+" para realizar el checkin y espera a ser atendido"+RESET);
-		
+
 		//Puesto atencion
-			this.puestoAtenAsignado.esperarEnHall(this);
+			aeropuerto.getHallCentral().entrarHallCentral(this.puestoAtenAsignado.getNro()); //entra al hall con su numero de puesto
 			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es llamado por el guardia y hace cola en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
-			this.puestoAtenAsignado.esperaAtencionEnCola();
+			this.puestoAtenAsignado.esperarEnPuesto(this);
 			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es atendido en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
 			this.puestoAtenAsignado.esperaFinAtencion();
+			aeropuerto.getHallCentral().salirDelHall(this.puestoAtenAsignado.getNro());
 			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" termino de ser atendido en el centro de atencion nro: "+this.puestoAtenAsignado.getNro()+" y se le indico que vaya a la terminal: "+this.terminalAsignada.getLetraTerminal()+". Va a tomar el tren"+RESET);
-	
+
 		//Tren
 			this.aeropuerto.esperarTren();
 			this.aeropuerto.indicarTerminalParada(terminalAsignada);

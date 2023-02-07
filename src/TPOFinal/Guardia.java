@@ -1,14 +1,17 @@
 package TPOFinal;
 
 public class Guardia implements Runnable{
-	private PuestoAtencion puestoAtencion;
-	public Guardia(PuestoAtencion puestoAtencion) {
-		this.puestoAtencion=puestoAtencion;
+	private HallCentral hallCentral;
+	private int nroPuestoAsignado;
+	public Guardia(HallCentral hallCentral, int nroPuestoAsignado ) {
+		this.hallCentral=hallCentral;
+		this.nroPuestoAsignado = nroPuestoAsignado;
 	}
 	
 	public void run() {
 		while(true) {
-			puestoAtencion.llamarCliente();
+			hallCentral.llamarPasajero(nroPuestoAsignado);
+
 		}
 	}
 }
