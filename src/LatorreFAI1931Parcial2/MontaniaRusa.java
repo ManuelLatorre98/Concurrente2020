@@ -1,6 +1,6 @@
 package LatorreFAI1931Parcial2;
 import java.util.concurrent.Semaphore;
-public class MontañaRusa {
+public class MontaniaRusa {
 	private Semaphore semCarro;
 	private int capacidad;
 	private int pasajerosEsp=0;
@@ -14,13 +14,13 @@ public class MontañaRusa {
 	private int esperandoBajar=0;
 
 	
-	public MontañaRusa(int capCarro, int cantV) {
+	public MontaniaRusa(int capCarro, int cantV) {
 		this.capacidad=capCarro;
 		this.cantVueltas=cantV;
 		this.semCarro= new Semaphore(capCarro,true);
 	}
 	
-	public boolean intentarSubirMontaña() {
+	public boolean intentarSubirMontania() {
 		boolean subio=false;
 		try {
 		mutex.acquire();
@@ -32,7 +32,7 @@ public class MontañaRusa {
 		mutex.acquire();
 
 		if(abierto) {
-			subio=true;//retorno si el pasajero paso porque subio o porque cerro la montaña
+			subio=true;//retorno si el pasajero paso porque subio o porque cerro la montanisa
 			this.contPasajCarro++;//Indico que hay un pasajero mas en el carro
 		}
 		pasajerosEsp--;//Hay un pasajero menos esperando

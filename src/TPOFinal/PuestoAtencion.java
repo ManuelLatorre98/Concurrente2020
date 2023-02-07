@@ -11,12 +11,15 @@ public class PuestoAtencion {
 	private Semaphore semEsperaAtencion=new Semaphore(0,true);
 	private BlockingQueue <Pasajero> colaPuestoAten = new LinkedBlockingQueue<Pasajero>(5);//Cola con limite 5
 	private BlockingQueue <Pasajero> colaHall = new LinkedBlockingQueue<Pasajero>();//Ilimitada
-	
+
+	private int capacidad;
 	private Semaphore mutex=new Semaphore(1,true);
 	private Semaphore semAtencion=new Semaphore(0,true);
-	public PuestoAtencion(int nro, Aeropuerto aeropuerto) {
+	public PuestoAtencion(int nro, int capacidad, Aeropuerto aeropuerto) {
 		this.nro=nro;
 		this.aeropuerto=aeropuerto;
+		this.capacidad = capacidad;
+
 	}
 	
 	//Operaciones pasajero
@@ -32,7 +35,6 @@ public class PuestoAtencion {
 	
 	public void esperaAtencionEnCola() {//Espera "dentro de la cola" a que lo atiendan
 		try {
-		
 			this.semEsperaAtencion.acquire();
 		}catch(InterruptedException e) {}
 	}
@@ -45,17 +47,13 @@ public class PuestoAtencion {
 	
 	
 	//Operaciones guardia
-	public void llamarCliente() {
+	/*public void llamarCliente() {
 		Pasajero pasajero;
 		try {
-
 			this.colaPuestoAten.put(this.colaHall.take());//Saca un hilo del hall y lo mete al puesto, si el hall queda vacio queda bloqueado, si el puestoAtencion esta lleno queda bloqueado
 			this.semHall.release();//Le indica al hilo del hall que pase a la cola del puesto
-			
-			
-			
 		}catch(InterruptedException e) {}
-	}
+	}*/
 	
 	//Operaciones empleadoPuestoAtencion
 	public void atenderCliente(EmpleadoPuestoAtencion empleado) {
@@ -65,9 +63,10 @@ public class PuestoAtencion {
 			pasajero=(Pasajero)this.colaPuestoAten.take();//Saca la referencia del cliente de la cola, si esta vacia queda bloqueado
 		
 		}catch(InterruptedException e) {}
-			this.semEsperaAtencion.release();//Avisa a un hilo que puede pasar
-			empleado.atenderCliente(pasajero,aeropuerto);
-			this.semAtencion.release();//Indica al pasajero que termino de ser atendido
+
+		this.semEsperaAtencion.release();//Avisa a un hilo que puede pasar
+		empleado.atenderCliente(pasajero,aeropuerto);
+		this.semAtencion.release();//Indica al pasajero que termino de ser atendido
 	}
 	public int getNro() {
 		return this.nro;

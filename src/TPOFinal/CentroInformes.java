@@ -22,8 +22,6 @@ public class CentroInformes implements Runnable{
 			puesto=aeropuerto.getPuestoAtencion(pasajero.getReserva().getNroReserva()-1);
 			pasajero.setPuestoAtenAsig(puesto);//Le asigna al pasajero el centro de atencion al que es derivado
 			Thread.sleep(1000);
-			
-			
 		}catch(InterruptedException e) {}
 	}
 }

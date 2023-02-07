@@ -20,7 +20,7 @@ public class GestorHora implements Runnable{
 			this.pasarTiempo();
 			this.reloj.actualizarHora();
 			System.out.println(RED+"Actualiza Hora a: "+reloj.getHoraStr()+RESET);
-			this.aeropuerto.revicionHora();//Le avisa al aeropuerto que se actualizo la hora del reloj
+			this.aeropuerto.revisionHora();//Le avisa al aeropuerto que se actualizo la hora del reloj
 			
 			/*for (int j = 0; j < puestosEmbarque.length; j++) {//PARA TESTEO
 				puestosEmbarque[j].revisionHora();//Cada embarque imprimira que abrio o cerro las puertas de embarque
@@ -34,7 +34,7 @@ public class GestorHora implements Runnable{
 	
 	private void pasarTiempo() {
 		try {
-			Thread.sleep(5000);//10 segundos por hora
+			Thread.sleep(5000);//n segundos por hora
 		}catch(InterruptedException e) {}
 	}
 }

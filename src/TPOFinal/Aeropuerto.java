@@ -22,6 +22,8 @@ public class Aeropuerto {
 	private int horaCierreInt;//En minuto
 	
 	boolean abierto=false;
+
+	private int capPuestosAten=5;
 	private PuestoAtencion[]puestosAten;
 	
 	//CentroInformes
@@ -30,7 +32,9 @@ public class Aeropuerto {
 	private Semaphore mutexCentroInf=new Semaphore(1,true);
 	private Semaphore mutexCentroInfDatos=new Semaphore(1,true);
 	private BlockingQueue <Pasajero> colaCentroInf = new LinkedBlockingQueue<Pasajero>();//Cola ilimitada
-	
+
+	//Hall Puestos de atencion
+	private HallCentral hallCentral = new HallCentral(puestosAten.length,capPuestosAten);
 	//Tren
 	private int capacidadTren=10;//La responsabilidad de setear esto creo que deberia ser del thread tren o directamente el tren deberia dar dicha info, lo seteo asi para no enrredar tanto
 	private int tiempoEsperaMs=15000;
@@ -55,7 +59,7 @@ public class Aeropuerto {
 		this.horaAperturaInt=reloj.traducirHora(horaApertura);
 		this.horaCierreInt=reloj.traducirHora(horaCierre);
 		
-		this.puestosAten=new PuestoAtencion[this.terminales.length];//Voy a tener 1 centro de atencion por plataforma/aerolinea
+		this.puestosAten=new PuestoAtencion[this.terminales.length];//Voy a tener 1 puesto de atencion por terminal/aerolinea
 		this.crearCentrosAtencion();
 		
 		this.lock=new ReentrantLock(true);
@@ -69,9 +73,9 @@ public class Aeropuerto {
 	
 	//Operaciones Aeropuerto
 	
-	private void crearCentrosAtencion() {//Un centro por aerolinea plataforma
+	private void crearCentrosAtencion() {//Un centro por aerolinea
 		for (int i = 0; i < this.terminales.length; i++) {
-			this.puestosAten[i]=new PuestoAtencion((i+1),this);//Los centros de atencion se identifican por su plataforma/aerolinea
+			this.puestosAten[i]=new PuestoAtencion((i+1),this.capPuestosAten,this);//Los centros de atencion se identifican por su plataforma/aerolinea
 		}
 	}
 
@@ -106,6 +110,9 @@ public class Aeropuerto {
 		return pos;
 	}
 
+	public HallCentral getHallCentral(){
+		return hallCentral;
+	}
 	
 	//OPERACIONES PASAJERO
 	public synchronized void intentoEntradaAeropuerto() {
@@ -116,13 +123,13 @@ public class Aeropuerto {
 		}catch(InterruptedException e) {}
 	}
 	
-	public void entrarAeropuerto(Pasajero pasajero) {//La reserva se le asignaba cuando llego al aeropuerto por eso lo hago aca
-		int nroReserva=(int)(Math.random()*this.terminales.length)+1;//El nro de reserva va por aerolinea/plataforma
-		int puestoTerminal=0;//Define el puesto de embarque, 1 puesto de embarque por vuelo, 7 vuelos por aerolinea/plataforma,
+	public void entrarAeropuerto(Pasajero pasajero) {//La reserva se le asigna cuando llego al aeropuerto por eso lo hago aca
+		int nroReserva=(int)(Math.random()*this.terminales.length)+1;//El nro de reserva va por aerolinea/terminal
+		int puestoTerminal=0;//Define el puesto de embarque, 1 puesto de embarque por vuelo, 7 vuelos por aerolinea/terminal,
 		Reserva reserva;
 		String horaArribo;
 		PuestoEmbarque puestoEmbarquePasajero;
-		puestoTerminal=((int)(Math.random()*this.terminales[nroReserva-1].getCantidadPuestosEmbarque())+1)+(this.terminales[nroReserva-1].getCantidadPuestosEmbarque()*(nroReserva-1));
+		puestoTerminal=((int)(Math.random()*this.terminales[nroReserva-1].getCantidadPuestosEmbarque())+1)+(this.terminales[nroReserva-1].getCantidadPuestosEmbarque()*(nroReserva-1));//Esto me da un puesto de embarque en funcion de la terminal/aerolinea
 		puestoEmbarquePasajero=this.terminales[nroReserva-1].getPuestoEmbarque(puestoTerminal);//Obtengo el puesto asignado
 		horaArribo=puestoEmbarquePasajero.getHorarioRandom();//Me entrega uno de sus horarios de embarque
 		reserva=new Reserva(nroReserva,puestoEmbarquePasajero.getNroPuesto(),horaArribo);
@@ -137,7 +144,7 @@ public class Aeropuerto {
 			this.colaCentroInf.put(pasajero);//Pongo una referencia a si mismo en la cola
 			
 			this.semCentroInf.acquire();//Queda loqueado hasta que le digan que puede pasar
-		;
+
 		
 		}catch(InterruptedException e) {}
 	}
@@ -155,9 +162,8 @@ public class Aeropuerto {
 				this.esperaTren.await();
 			}catch(InterruptedException e) {};
 		}
-		
-		if(this.cantPasajerosEsp==0) {//El primero inidica si hay pasajeros esperando
-			this.cantPasajerosEsp++;
+		this.cantPasajerosEsp++;
+		if(this.cantPasajerosEsp==1) {//El primero indica que hay pasajeros esperando
 			this.esperaPasajeros.signal();
 		}
 		this.cantPasajerosEnTren++;//Se va a subir al tren asi que suma uno
@@ -175,25 +181,21 @@ public class Aeropuerto {
 	
 	
 	public void tomarTren() {
-		
 		try {	
 			this.barrierStartTren.await(this.tiempoEsperaMs,TimeUnit.MILLISECONDS);//Espera a que el tren este lleno o pase el tiempo
 		}catch(InterruptedException e) {
 		}catch(BrokenBarrierException e) {
 		}catch(TimeoutException e) {//Suponogo que viene para aca con el timeout
 		}
-	
-		
-		
 	}
 	
 	public void viajarEnTren(Terminal terminalAsignada) {
 		this.lock.lock();
-		if(!this.enMarcha) {//Si el tren sigue parado
-			this.enMarcha=true;//Indica que se puede poner en marcha
+		this.cantPasajerosEsp--;//Una vez en el tren el pasajero indica que ya no espera
+		if(!this.enMarcha && cantPasajerosEsp==0) {//Si el tren sigue parado y ya no quedan pasajeros
+			this.enMarcha=true;//El ultimo indica que se puede poner en marcha
 			this.esperaArranque.signal();//Le avisa al tren que puede arrancar ya sea porque se libero la barrier por capacidad o tiempo
 		}
-		this.cantPasajerosEsp--;//Indica que ya no esta esperando
 		while(this.letraTerminalActual!=terminalAsignada.getLetraTerminal()) {//Mientras el tren no haya parado en su terminal espera
 			try {
 				this.viajando.await();
@@ -214,21 +216,20 @@ public class Aeropuerto {
 			try {
 				Thread.sleep(10);//Para que salgan mensajes en orden y quede claro en testeo
 				pasajero=(Pasajero)this.colaCentroInf.take();//Saca la referencia del cliente de la cola, si esta vacia queda bloqueado
-			
 			}catch(InterruptedException e) {}
-				//System.out.println("PASAJEROOOOOOOOOOOOOO"+pasajero.getNombre());//Prueba que atiende al que saca de la lista junto con mensaje en centroInforems.atenderCliente(). con un sleep de 500 antes del take se ven mensajes en orden
-				this.semCentroInf.release();//Avisa a un hijo que puede pasar
-				
-				//El setPuestoAten tiene mas sentido que se haga en centroInformes o aca?
-				
-				centro.atenderCliente(pasajero);//Atiende al pasajero y se lleva la referencia de los centros de atencion para poder trabajar
-				this.semAtencionCentroInf.release();
+
+			//System.out.println("PASAJEROOOOOOOOOOOOOO"+pasajero.getNombre());//Prueba que atiende al que saca de la lista junto con mensaje en centroInforems.atenderCliente(). con un sleep de 500 antes del take se ven mensajes en orden
+			this.semCentroInf.release();//Avisa a un pasajero que puede pasar
+
+			//El setPuestoAten tiene mas sentido que se haga en centroInformes o aca?
+
+			centro.atenderCliente(pasajero);//Atiende al pasajero y se lleva la referencia de los centros de atencion para poder trabajar
+			this.semAtencionCentroInf.release();
 		}
 	
 	//Operaciones del tren
 	public void recogerPasajeros() {
 		lock.lock();
-		
 		while(this.cantPasajerosEsp==0) {//Mientras no haya pasajeros espera, el primer pasajero que llegue le avisa
 			try {
 				this.esperaPasajeros.await();
@@ -283,7 +284,7 @@ public class Aeropuerto {
 	
 	
 	//Operaciones GestorHora
-	public synchronized void revicionHora() {//Luego de actualizarse la hora se notifica por si estaba cerrado y pasa a estar abierto
+	public synchronized void revisionHora() {//Luego de actualizarse la hora se notifica por si estaba cerrado y pasa a estar abierto
 		if(!abierto && this.reloj.getHoraInt()>=this.horaAperturaInt && this.reloj.getHoraInt()<=this.horaCierreInt) {//Si estaba cerrado y es hora de abrir notifica
 			this.abierto=true;
 			System.out.println(ROJOFONDO+"ABRE EL AEROPUERTO"+RESET);

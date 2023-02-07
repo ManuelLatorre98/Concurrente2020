@@ -12,9 +12,9 @@ public class Vida {
 		System.out.println("El Curandero curo "+valorCura+" de vida, vida actual: "+this.getVida() );
 	}
 	
-	public synchronized void quitarVida(int valorDaño) {
-		this.vida-=valorDaño;	
-		System.out.println("El Orco causo "+valorDaño+" de daño, vida restante: "+this.getVida() );
+	public synchronized void quitarVida(int valorDanio) {
+		this.vida-=valorDanio;
+		System.out.println("El Orco causo "+valorDanio+" de daï¿½o, vida restante: "+this.getVida() );
 	}
 	
 	public synchronized int getVida() {

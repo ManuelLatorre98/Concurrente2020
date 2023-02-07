@@ -31,8 +31,6 @@ public class Pasajero implements Runnable{
 	public void run() {
 		//Entrada aeropuerto
 		//while(true) {//Dificulta testeo
-			PuestoAtencion centroAten;
-			this.setNombre(Thread.currentThread().getName());//BORRAR
 			System.out.println("El "+Thread.currentThread().getName()+" intenta entrar al aeropuerto");
 			this.aeropuerto.intentoEntradaAeropuerto();
 			System.out.println("El "+Thread.currentThread().getName()+" entra al aeropuerto");
@@ -90,7 +88,6 @@ public class Pasajero implements Runnable{
 				System.out.println(ROJOFONDO+"El pasajero "+Thread.currentThread().getName()+" perdio su vuelo de las "+reserva.getHoraArribo()+"hs. Se va del aeropuerto"+RESET);
 			}
 		}
-	//}
 	
 	private void entrarShop() {
 		int valor;

@@ -4,35 +4,31 @@ package TPOFinal;
 public class Main {
 	public static void main(String[] args) {
 		int cantTerminales=3;
-		int cantPuestosEmbarque=7;//Por terminal todas las terminales tienen la misma cantidad para simplificar creacion
+		int cantPuestosEmbarque=7;//Todas las terminales tienen la misma cantidad para simplificar creacion
 		Reloj reloj=new Reloj("05:00");
 		PuestoEmbarque []puestosEmbarque=new PuestoEmbarque[cantPuestosEmbarque*cantTerminales];
 		Terminal[]terminales=new Terminal[cantTerminales];
 		PuestoEmbarque[]puestosTerminal=null;
-		
+
+		//inicializa los puestos de embarque (los de todas las terminales)
 		for (int i = 0; i < puestosEmbarque.length; i++) {
 			puestosEmbarque[i]=new PuestoEmbarque(i+1,reloj);
 		}
-		
+
+		//Crea las terminales
 		for (int i = 0; i < cantTerminales; i++) {
-			puestosTerminal=new PuestoEmbarque[cantPuestosEmbarque];
-			for (int j = 0; j < cantPuestosEmbarque; j++) {
-				puestosTerminal[j]=puestosEmbarque[(((j)+1)+(cantPuestosEmbarque*(i)))-1];
-				
+			int indicePuesto= cantPuestosEmbarque*i;//Terminal 1 su primer puesto es 0, terminal 2 el primer puesto el 7 etc.
+			puestosTerminal=new PuestoEmbarque[cantPuestosEmbarque]; //array de puestos de embarque nuevo
+			for (int j = 0; j < cantPuestosEmbarque; j++) { //Asigna los puestos antes creados a cada terminal
+				puestosTerminal[j]=puestosEmbarque[(j+indicePuesto)];
 			}
 			
-			terminales[i]=new Terminal(Character.toChars(65+i)[0],puestosTerminal,reloj);//Uso ascii para obtener la letra de la terminal, supongo que puede haber temrinales hasta la Z
+			terminales[i]=new Terminal(Character.toChars(65+i)[0],puestosTerminal,reloj);//Uso ascii para obtener la letra de la terminal, supongo que puede haber terminales hasta la Z
 			//En pos 0 de terminales esta la terminal con letra A
 			//Lo hice con letras para no confundirlo con los puertos de embarque
-			
-			
-			}
-		
-		
-		//System.out.println("TERMINAL: "+terminales[0].getLetraTerminal()+ "   "+terminales[0].getPuestoEmbarque(1).getNroPuesto());
+		}
+
 		Aeropuerto aeropuerto=new Aeropuerto("06:00","22:00",reloj,terminales);
-		
-	
 		
 		//Hora
 		GestorHora gestorHora= new GestorHora(reloj,aeropuerto,terminales,puestosEmbarque);
@@ -40,14 +36,14 @@ public class Main {
 		
 		//Pasajeros
 		Pasajero[]arrayPasajeros=new Pasajero[48];
-		Thread [] threadPasajeros= new Thread[48];
+		Thread [] threadPasajeros= new Thread[arrayPasajeros.length];
 		
 		//CentroInformes
 		CentroInformes centroInformes= new CentroInformes(aeropuerto);
 		Thread threadCentroInf= new Thread(centroInformes);
 		
 		//Empleado puesto atencion
-		EmpleadoPuestoAtencion []arrayEmpPuestosAten=new EmpleadoPuestoAtencion[cantTerminales];
+		EmpleadoPuestoAtencion []arrayEmpPuestosAten=new EmpleadoPuestoAtencion[aeropuerto.getListaPuestosAtencion().length];
 		Thread[]threadEmpPuestosAten=new Thread[cantTerminales];
 		
 		//Guardia

@@ -7,10 +7,7 @@ public class PuestoEmbarque {
 	int nroPuesto;
 	private Reloj reloj;
 	private int cantHorarios=6;
-	private String [] horariosEmbarque=new String[cantHorarios];//11:00 primer embarque, 21:00 ultimo embarque, //De aca se saca uno random y se lo entrega al cliente
-	//Para los horarios podria haber usado una lista para que sea mas reutilizable, pero con un array me alcanza para testear
-	//En vez de creacion automatica de horarios podria poner un setHorarios para poner los horarios deseados en la lista
-	private int horaUltimoEmbarque;
+	private String [] horariosEmbarque=new String[cantHorarios];//11:00 primer embarque, 21:00 ultimo embarque
 	public PuestoEmbarque(int nro,Reloj reloj) {
 		this.nroPuesto=nro;
 		this.reloj=reloj;
@@ -19,7 +16,7 @@ public class PuestoEmbarque {
 	}
 	
 	public void crearHorariosEmbarque() {//Genera automaticamente, para facilitar todos los puertos tienen los mismos horarios de embarque
-		int horaPrimerEmbarque=11;//Solo poner la hora. Ejemplo: para 17:00hs hay que poner 17, hay que tener cuidado con array
+		int horaPrimerEmbarque=11;//Solo poner la hora. Ejemplo: para 17:00hs hay que poner 17
 		int horaMin;
 		int diferenciaEntreEmbarque=2;//Cantidad de horas entre embarques
 		String horaArribo;

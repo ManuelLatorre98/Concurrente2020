@@ -18,7 +18,7 @@ public class Buffer {
 		try {
 			
 			cola.take();
-			System.out.println("Se consume el "+objeto);
+			//System.out.println("Se consume el "+objeto);
 		} catch (InterruptedException e) {
 		}
 	}
@@ -31,7 +31,7 @@ public class Buffer {
 			this.nroProducto++;
 			mutex.release();
 			Thread.sleep(1000);
-			System.out.println("Se produjo el "+objeto);
+			//System.out.println("Se produjo el "+objeto);
 			cola.put(objeto);
 		} catch (InterruptedException e) {
 		}
