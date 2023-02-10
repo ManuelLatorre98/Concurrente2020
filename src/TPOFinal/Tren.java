@@ -32,5 +32,4 @@ public class Tren implements Runnable{
 		}catch(InterruptedException e) {}
 		
 	}
-	
 }

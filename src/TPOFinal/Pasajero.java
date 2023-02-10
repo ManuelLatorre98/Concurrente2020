@@ -45,6 +45,7 @@ public class Pasajero implements Runnable{
 			System.out.println(CYAN+"El "+Thread.currentThread().getName()+" termina de ser atendido y es derivado al centro de atencion nro "+this.puestoAtenAsignado.getNro()+" para realizar el checkin y espera a ser atendido"+RESET);
 
 		//Puesto atencion
+			//System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es entra al hall central y espera  a ser llamado a un centro de atencion"+RESET);
 			aeropuerto.getHallCentral().entrarHallCentral(this.puestoAtenAsignado.getNro()); //entra al hall con su numero de puesto
 			System.out.println(GREEN+"El "+Thread.currentThread().getName()+" es llamado por el guardia y hace cola en el puesto de atencion nro: "+this.puestoAtenAsignado.getNro()+RESET);
 			this.puestoAtenAsignado.esperarEnPuesto(this);

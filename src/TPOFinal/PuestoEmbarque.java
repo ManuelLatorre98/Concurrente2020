@@ -34,31 +34,5 @@ public class PuestoEmbarque {
 	public int getNroPuesto() {
 		return this.nroPuesto;
 	}
-	
-	private boolean esHorarioEmbarque(String hora) {
-		boolean encontrado=false;
-		int i=0;
-		while(i<this.horariosEmbarque.length && !encontrado) {
-			if(this.horariosEmbarque[i].equals(hora)) {
-				encontrado=true;
-			}else {
-				i++;
-			}
-		}
-		return encontrado;
-	}
-	
-	public void revisionHora() {
-		/*String horaActual=reloj.getHoraStr();
-	
-		if(this.esHorarioEmbarque(reloj.getHoraStr())) {//Si la hora actual es la hora de un arribo del puesto de embarque
-			System.out.println(CYAN+"El puesto de embarque "+this.nroPuesto+" abre sus puertas de embarque"+RESET);
-			this.horaUltimoEmbarque=reloj.horaStringToHoraInt(reloj.getHoraStr());
-		}else {
-			if(reloj.getHoraInt()==this.horaUltimoEmbarque+30) {//Habra 30 minutos para que los pasajeros puedan embarcar luego se cierran las puertas
-				System.out.println(CYAN+"El puesto de embarque "+this.nroPuesto+" cierra sus puertas de embarque"+RESET);
-			}
-		}*///Descomentar para ver que abren y cierran embarques correctamente
-	}
 
 }
